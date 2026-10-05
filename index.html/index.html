@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>F1 News & Race Calendar</title>
+
+    <link rel="stylesheet" href="style.css">
+    <script src="script.js" defer></script>
+  </head>
+
+  <body>
+    <main class="page">
+      <h1>F1 News & Race Calendar</h1>
+
+      <nav class="page-nav" aria-label="Page sections">
+        <a href="#calendar-title">Race calendar</a>
+        <a href="#news-title">Latest news</a>
+      </nav>
+
+      <section class="calendar-section" aria-labelledby="calendar-title">
+        <h2 id="calendar-title">Race calendar</h2>
+
+        <div class="calendar-controls">
+          <label for="season-select">Season</label>
+
+          <select id="season-select" disabled>
+            <option value="">Loading seasons...</option>
+          </select>
+
+          <button id="refresh-calendar" type="button" disabled>
+            Refresh calendar
+          </button>
+        </div>
+
+        <p id="calendar-message" role="status">
+          Loading race calendar...
+        </p>
+
+        <div
+          id="calendar-list"
+          class="calendar-grid"
+          aria-busy="true"
+        ></div>
+
+        <p class="data-credit">
+          Race data:
+          <a href="https://github.com/jolpica/jolpica-f1">Jolpica</a>
+          ·
+          <a href="https://github.com/jolpica/jolpica-f1/blob/main/TERMS.md">
+            Data terms
+          </a>
+        </p>
+      </section>
+
+      <section class="news-section" aria-labelledby="news-title">
+        <div class="section-heading">
+          <h2 id="news-title">Latest F1 news</h2>
+
+          <button id="refresh-news" type="button">
+            Refresh news
+          </button>
+        </div>
+
+        <label class="search-label" for="news-search">
+          Search news
+        </label>
+
+        <input
+          id="news-search"
+          type="search"
+          placeholder="Search drivers, teams, or headlines..."
+        >
+
+        <p id="news-message" role="status">Loading F1 news...</p>
+        <div id="news-list" aria-busy="true"></div>
+      </section>
+    </main>
+
+    <template id="news-card-template">
+      <article class="news-card">
+        <h3></h3>
+        <p></p>
+        <a href="#" target="_blank" rel="noopener noreferrer">
+          Read article
+        </a>
+      </article>
+    </template>
+  </body>
+</html>
