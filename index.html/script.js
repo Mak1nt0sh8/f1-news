@@ -144,30 +144,33 @@ function renderCalendar(data) {
   data.races.forEach(function (race) {
     const card = document.createElement("article");
     card.className = "race-card";
+    const link = document.createElement("a");
+    link.className = "race-card-link";
+    link.href = "/grand-prix.html?season=" + race.season + "&round=" + race.round;
 
     const status = Object.hasOwn(statusLabels, race.status)
       ? race.status
       : "results-pending";
 
-    card.appendChild(createTextElement(
+    link.appendChild(createTextElement(
       "span",
       "race-status status-" + status,
       statusLabels[status]
     ));
 
-    card.appendChild(createTextElement(
+    link.appendChild(createTextElement(
       "h3",
       "race-title",
       "Round " + race.round + " · " + race.name
     ));
 
-    card.appendChild(createTextElement(
+    link.appendChild(createTextElement(
       "p",
       "race-date",
       formatRaceDate(race.date)
     ));
 
-    card.appendChild(createTextElement(
+    link.appendChild(createTextElement(
       "p",
       "race-circuit",
       race.circuit.name
@@ -179,7 +182,7 @@ function renderCalendar(data) {
     ].filter(Boolean).join(" · ");
 
     if (location) {
-      card.appendChild(createTextElement(
+      link.appendChild(createTextElement(
         "p",
         "race-location",
         location
@@ -196,11 +199,13 @@ function renderCalendar(data) {
       }
     }
 
-    card.appendChild(createTextElement(
+    link.appendChild(createTextElement(
       "p",
       "race-winner",
       winnerText
     ));
+    link.appendChild(createTextElement("span", "view-weekend", "View weekend →"));
+    card.appendChild(link);
 
     fragment.appendChild(card);
   });
@@ -221,7 +226,7 @@ async function loadCalendar() {
   calendarList.setAttribute("aria-busy", "true");
   calendarList.replaceChildren();
 
-  calendarTitle.textContent = season + " race calendar";
+    calendarTitle.textContent = season + " race calendar";
   calendarMessage.textContent = "Loading " + season + " races...";
 
   try {
@@ -236,6 +241,9 @@ async function loadCalendar() {
     }
 
     renderCalendar(data);
+    const pageUrl = new URL(location.href);
+    pageUrl.searchParams.set("season", season);
+    history.replaceState(null, "", pageUrl);
   } catch (error) {
     calendarMessage.textContent =
       "Unable to load this calendar. Click Refresh calendar to retry.";
@@ -273,9 +281,10 @@ async function loadSeasons() {
 
     const currentYear = new Date().getUTCFullYear();
 
-    const initialYear = seasons.includes(currentYear)
-      ? currentYear
-      : seasons.find(function (year) {
+    const requestedYear = Number(new URLSearchParams(location.search).get("season"));
+    const initialYear = seasons.includes(requestedYear)
+      ? requestedYear
+      : seasons.includes(currentYear) ? currentYear : seasons.find(function (year) {
           return year <= currentYear;
         }) || seasons[0];
 

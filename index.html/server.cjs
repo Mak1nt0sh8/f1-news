@@ -2,6 +2,7 @@ const http = require("node:http");
 const fs = require("node:fs/promises");
 const path = require("node:path");
 const Parser = require("rss-parser");
+const { createRaceDetails } = require("./race-details.cjs");
 
 const sources = [
   {
@@ -44,6 +45,14 @@ const files = new Map([
   }],
   ["/script.js", {
     name: "script.js",
+    type: "text/javascript; charset=utf-8"
+  }],
+  ["/grand-prix.html", {
+    name: "grand-prix.html",
+    type: "text/html; charset=utf-8"
+  }],
+  ["/grand-prix.js", {
+    name: "grand-prix.js",
     type: "text/javascript; charset=utf-8"
   }]
 ]);
@@ -397,6 +406,11 @@ async function getCalendar(season) {
   });
 }
 
+const getRaceDetails = createRaceDetails({
+  fetchJolpica,
+  cachedValue: cachedCalendarValue
+});
+
 const server = http.createServer(async function (request, response) {
   let pathname;
   let requestUrl;
@@ -408,6 +422,36 @@ const server = http.createServer(async function (request, response) {
     response.statusCode = 400;
     response.setHeader("Content-Type", "text/plain; charset=utf-8");
     response.end("Invalid request URL.");
+    return;
+  }
+
+  if (pathname === "/api/race-details") {
+    response.setHeader("Content-Type", "application/json; charset=utf-8");
+    response.setHeader("Cache-Control", "no-store");
+    const seasonText = requestUrl.searchParams.get("season") || "";
+    const roundText = requestUrl.searchParams.get("round") || "";
+    const season = Number(seasonText);
+    const round = Number(roundText);
+
+    if (!/^\d{4}$/.test(seasonText) || season < 1950 ||
+        season > new Date().getUTCFullYear() + 1 ||
+        !/^[1-9]\d?$/.test(roundText)) {
+      response.statusCode = 400;
+      response.end(JSON.stringify({ error: "Choose a valid season and Grand Prix round." }));
+      return;
+    }
+
+    try {
+      response.end(JSON.stringify(await getRaceDetails(season, round)));
+    } catch (error) {
+      console.error("Grand Prix data error:", error.message);
+      response.statusCode = error.statusCode === 404 ? 404 : 502;
+      response.end(JSON.stringify({
+        error: response.statusCode === 404
+          ? "This Grand Prix was not found in the selected season."
+          : "Unable to load this Grand Prix. Please try again."
+      }));
+    }
     return;
   }
 
@@ -477,6 +521,7 @@ const server = http.createServer(async function (request, response) {
   try {
     const contents = await fs.readFile(path.join(__dirname, file.name));
     response.setHeader("Content-Type", file.type);
+    response.setHeader("Cache-Control", "no-cache");
     response.end(contents);
   } catch (error) {
     console.error("Website file error:", error.message);

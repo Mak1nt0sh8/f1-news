@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Grand Prix details | F1 News</title>
+    <link rel="stylesheet" href="/style.css">
+    <script esrc="/grand-prix.js" defer></script>
+  </head>
+
+  <body>
+    <main class="page">
+      <header class="gp-header">
+        <a id="back-to-calendar" class="back-link" href="/#calendar-title">
+          ← Back to the calendar
+        </a>
+
+        <div class="section-heading">
+          <h1 id="gp-title">Grand Prix details</h1>
+          <button id="reload-details" class="details-button" type="button">
+            Refresh details
+          </button>
+        </div>
+
+        <p id="gp-circuit" class="details-meta"></p>
+        <p id="gp-meta" class="details-meta"></p>
+      </header>
+
+      <p id="details-message" class="session-note" role="status" aria-live="polite">
+        Loading Grand Prix details…
+      </p>
+
+      <div id="gp-content" aria-busy="true">
+        <section id="weekend-schedule" aria-labelledby="weekend-schedule-title" hidden>
+          <h2 id="weekend-schedule-title">Weekend schedule</h2>
+          <p id="timezone-note" class="session-note"></p>
+          <div id="gp-schedule" class="schedule-grid"></div>
+        </section>
+
+        <nav id="session-nav" class="session-nav" aria-label="Session results" hidden></nav>
+        <div id="session-sections"></div>
+      </div>
+
+      <footer class="data-credit">
+        <p>
+          Schedule and results data from
+          <a href="https://github.com/jolpica/jolpica-f1">Jolpica F1</a>
+          and <a href="https://openf1.org/">OpenF1</a>, where available.
+          <a href="https://github.com/jolpica/jolpica-f1/blob/main/TERMS.md">Jolpica data terms</a>.
+        </p>
+      </footer>
+    </main>
+  </body>
+</html>
